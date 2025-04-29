@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Salida - Sistema de Parqueadero</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Sistema de Parqueadero</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">Inicio</a>
+                </li>
+            </ul>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline-light">Cerrar Sesión</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Registrar Salida de Vehículo</h2>
+        </div>
+        <div class="col-auto">
+            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <p><strong>Placa:</strong> <span th:text="${registro.placa}"></span></p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Tipo:</strong> <span th:text="${registro.tipoVehiculo.nombre}"></span></p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Ubicación:</strong> <span th:text="${registro.ubicacion}"></span></p>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <p><strong>Hora de Entrada:</strong> <span th:text="${registro.horaEntrada}"></span></p>
+                </div>
+            </div>
+
+            <form th:action="@{/api/registros/{id}/salida(id=${registro.id})}" method="post" id="registrarSalidaForm">
+                <div class="form-group">
+                    <label for="horaSalida">Hora de Salida</label>
+                    <input type="number" class="form-control" id="horaSalida" name="horaSalida"
+                           required min="0" max="23">
+                    <small class="form-text text-muted">Hora en formato 24 horas (0-23).</small>
+                </div>
+
+                <button type="submit" class="btn btn-success">Registrar Salida</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('registrarSalidaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = [[${registro.id}]];
+        const horaSalida = document.getElementById('horaSalida').value;
+
+        fetch(`/api/registros/${id}/salida?horaSalida=${horaSalida}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/dashboard';
+            } else {
+                alert('Error al registrar la salida');
+            }
+        });
+    });
+</script>
+</body>
+</html>
